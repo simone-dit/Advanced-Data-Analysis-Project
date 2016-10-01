@@ -1,6 +1,8 @@
 setwd('C:/Users/Jack/Desktop/Columbia Masters/Fall 2016 Courses/Advanced Data Analysis/Group Project/hillary-clinton-emails-kaggle')
 
 library(ggplot2)
+library(dplyr)
+
 
 #reading tables
 Aliases = read.csv('Aliases.csv')
@@ -19,7 +21,24 @@ dims = as.data.frame(rbind(
 names(dims) = c('Table Name', 'Rows', 'Columns')
 print(dims)
 
+
+#getting table fields
+names(Aliases)
+names(EmailReceivers)
+names(Emails)
+names(Persons)
+
+
 #getting the number of emails sent by person
+T = merge(x = Emails, y = Persons, by.x = 'SenderPersonId',
+	 by.y = 'Id')
+T2 = table(T$Name)
+sorted_freq = sort(T2, decreasing = TRUE)
 
 
 #getting the number of emails received by person
+T3 = merge(x = EmailReceivers, y = Persons, 
+		 by.x = 'PersonId', by.y = 'Id')
+T4 = table(T3$Name)
+sorted_freq_rec = sort(T4, decreasing = TRUE)
+
