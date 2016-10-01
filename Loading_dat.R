@@ -7,3 +7,19 @@ Aliases = read.csv('Aliases.csv')
 EmailReceivers = read.csv('EmailReceivers.csv')
 Emails = read.csv('Emails.csv')
 Persons = read.csv('Persons.csv')
+
+
+#getting table dimensions
+dims = as.data.frame(rbind(
+	t(c('Aliases', dim(Aliases))),
+	t(c('Email Receivers', dim(EmailReceivers))),
+	t(c('Emails', dim(Emails))),
+	t(c('Persons', dim(Persons)))
+))
+names(dims) = c('Table Name', 'Rows', 'Columns')
+print(dims)
+
+#getting the number of emails sent by person
+
+
+#getting the number of emails received by person
