@@ -2,6 +2,7 @@ setwd('C:/Users/Jack/Desktop/Columbia Masters/Fall 2016 Courses/Advanced Data An
 
 library(ggplot2)
 library(dplyr)
+library(magrittr)
 
 #reading tables
 Aliases = read.csv('Aliases.csv')
@@ -22,17 +23,16 @@ print(dims)
 
 #getting the number of emails sent by person
 num.emails.sent <-
-    inner_join(
-        summarise(group_by(Emails, SenderPersonId), count=n()),
-        Persons,
-        by=c("SenderPersonId"="Id"))
+    group_by(Emails, SenderPersonId) %>%
+        summarise(count=n()) %>%
+        inner_join(Persons, by=c("SenderPersonId"="Id"))
 
 #getting the number of emails received by person
 num.emails.recvd <-
-    inner_join(
-        summarise(group_by(EmailReceivers, PersonId), count=n()),
-        Persons,
-        by=c("PersonId"="Id"))
+    group_by(EmailReceivers, PersonId) %>%
+        summarise(count=n()) %>%
+        inner_join(Persons, by=c("PersonId"="Id"))
+
 
 ggplot(arrange(num.emails.sent, desc(count)), aes(x=reorder(Name, -count), y=count)) +
     geom_bar(stat="identity") +
@@ -40,7 +40,7 @@ ggplot(arrange(num.emails.sent, desc(count)), aes(x=reorder(Name, -count), y=cou
             scale_x_discrete(name="Sender") +
                 scale_y_continuous(name="Number of e-mails sent")
 
-ggplot(arrange(num.emails.recvd, desc(count)), aes(x=reorder(Name, -count), y=count)) +
+ggplot(arrange(num.emails.recvd[num.emails.recvd$count > 3,], desc(count)), aes(x=reorder(Name, -count), y=count)) +
     geom_bar(stat="identity") +
         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
             scale_x_discrete(name="Receiver") +
