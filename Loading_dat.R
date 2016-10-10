@@ -12,6 +12,10 @@ Emails = read.csv('Emails.csv')
 Persons = read.csv('Persons.csv')
 
 
+#useful for just looking at the data
+View(head(Emails, 50))
+
+
 #getting table dimensions
 dims = as.data.frame(rbind(
 	t(c('Aliases', dim(Aliases))),
@@ -60,5 +64,7 @@ raw_text = as.data.frame(apply(raw_text, 1, str_replace_all,
 						 '[\\s]+', ' '))
 Emails_Cleaned['ExtractedBodyText'] = raw_text
 write.csv(Emails_Cleaned, file = 'Emails_cleaned.csv', row.names = FALSE)
+
+
 
 
