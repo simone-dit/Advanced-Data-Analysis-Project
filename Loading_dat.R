@@ -54,7 +54,11 @@ ggplot(arrange(num.emails.recvd[num.emails.recvd$count > 3,], desc(count)), aes(
 Emails_Cleaned = Emails
 raw_text = as.data.frame(Emails_Cleaned['ExtractedBodyText'])
 raw_text = as.data.frame(apply(raw_text, 1, str_replace_all, '\n', ' '))
-raw_text = as.data.frame(apply(raw_text, 1, str_replace_all, '[^a-zA-Z]', ''))
-write.csv(raw_text, file = 'Emails_cleaned.csv', row.names = FALSE)
+raw_text = as.data.frame(apply(raw_text, 1, str_replace_all, 
+						 '[^0-9a-zA-Z!@#$%^&*()_,.+=-\\[\\]<>:;\'\"~?/|{} ]', ''))
+raw_text = as.data.frame(apply(raw_text, 1, str_replace_all,
+						 '[\\s]+', ' '))
+Emails_Cleaned['ExtractedBodyText'] = raw_text
+write.csv(Emails_Cleaned, file = 'Emails_cleaned.csv', row.names = FALSE)
 
 
