@@ -1,8 +1,9 @@
-setwd('C:/Users/Jack/Desktop/Columbia Masters/Fall 2016 Courses/Advanced Data Analysis/Group Project/hillary-clinton-emails-kaggle')
+setwd('C:/Users/Jack/Desktop/Columbia Masters/Fall 2016 Courses/Advanced Data Analysis/Group Project/Advanced Data Analysis Project')
 
 library(ggplot2)
 library(dplyr)
 library(magrittr)
+library(stringr)
 
 #reading tables
 Aliases = read.csv('Aliases.csv')
@@ -45,3 +46,15 @@ ggplot(arrange(num.emails.recvd[num.emails.recvd$count > 3,], desc(count)), aes(
         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
             scale_x_discrete(name="Receiver") +
                 scale_y_log10(name="Number of e-mails received")
+
+
+
+
+#work to clean the email text data and export to a new dataset
+Emails_Cleaned = Emails
+raw_text = as.data.frame(Emails_Cleaned['ExtractedBodyText'])
+raw_text = as.data.frame(apply(raw_text, 1, str_replace_all, '\n', ' '))
+raw_text = as.data.frame(apply(raw_text, 1, str_replace_all, '[^a-zA-Z]', ''))
+write.csv(raw_text, file = 'Emails_cleaned.csv', row.names = FALSE)
+
+
