@@ -20,3 +20,5 @@ tm.clean.emails <-
         tm_map(removeWords, stopwords("english")) %>%
         tm_map(stemDocument)
 text <- lapply(1:nrow(clean.emails), . %>% `[[`(tm.clean.emails, . ) %>% as.character)
+
+emails$CleanExtractedBodyText <- text
