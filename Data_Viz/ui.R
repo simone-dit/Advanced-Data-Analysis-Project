@@ -10,20 +10,20 @@
 library(shiny)
 library(visNetwork)
 
-nodes_max = 10
+nodes_max = 100
 nodes_cur = 3
 
-# Define UI for application
+# Define UI for application that draws a histogram
 shinyUI(fluidPage(
   
   # Application title
   titlePanel("Hillary Clinton Data"),
   
-  # Sidebar with a slider input
+  # Sidebar with a slider input for number of bins 
   sidebarLayout(
     sidebarPanel(
     	
-    	  #randomization seed
+       #randomization seed
     	  sliderInput("Seed",
     	  		    "Randomization Seed",
     	  		    min = 1,
@@ -46,10 +46,12 @@ shinyUI(fluidPage(
        		    value = 0.5)
     ),
     
-    # Show plot
+    # Show a plot of the generated distribution
     mainPanel(
-       # plotOutput("ShowPlot")
-       visNetworkOutput("network")
+    		tabsetPanel(
+        		tabPanel("Network", visNetworkOutput("network")),
+        		tabPanel("Another tab")
+        	)
     )
   )
 ))
