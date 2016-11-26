@@ -10,10 +10,12 @@ Aliases = read.csv('Aliases.csv')
 EmailReceivers = read.csv('EmailReceivers.csv')
 Emails = read.csv('Emails.csv')
 Persons = read.csv('Persons.csv')
+#Emails_cleaned = read.csv('Emails_cleaned.csv')
 
 
 #useful for just looking at the data
-View(head(Emails, 50))
+View(head(Emails, 200))
+View(head(Emails_cleaned, 200))
 
 
 #getting table dimensions
