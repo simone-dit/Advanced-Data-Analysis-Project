@@ -106,16 +106,24 @@ compute.pagerank <- function(transitions, damp, itrs) {
     next.itr
 }
 
-rank.sentences <- function(text) {
+doc2bows <- function(text) {
     wordvecs <- doc2wordvec(text)
-    bows <- sapply(wordvecs, vec2bow)
+    sapply(wordvecs, vec2bow)
+}
+
+bows2rank <- function(bows) {
     probs <- compute.pagerank(get.transitions(bows), 0.85, 10)
     order(-as.vector(probs))
 }
 
-doc2bow <- function(text) {
-    wordvecs <- doc2wordvec(text)
-    sapply(wordvecs, vec2bow)
+summarize.document <- function(text, top.k=1) {
+    if (nchar(text) < 200)
+        text
+    else {
+        bows <- doc2bows(text)
+        ranks <- bows2rank(bows)
+        do.call(paste, as.list(names(bows))[ sort(ranks[1:min(top.k, length(bows))]) ])
+    }
 }
 
 ex.doc <- paste(
@@ -123,3 +131,7 @@ ex.doc <- paste(
     "The: idea behind these notes was to give a more intuitive and natural, yet fully rigorous,approach to stochastic integration- and semimartingales than the traditional method.",
     "The stochastic integral and related concepts were developed without requiring advanced results such as optional and predictable projection or the Doob-Meyer decomposition which are often used in traditional approaches.",
     "Then, the more advanced theory of semimartingales was developed after stochastic integration had already been established.")
+
+summarize.document(ex.doc, top.k=2)
+
+summarize.document(emails$ExtractedBodyText[4321], top.k=3)
