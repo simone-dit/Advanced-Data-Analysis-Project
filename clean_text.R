@@ -20,7 +20,7 @@ sentence.cleaner <-
     . %>%
  tolower %>%
  removeWords(stopwords("english")) %>%
- gsub("[^[:alnum:] ]", "", .) %>%
+ gsub("[^[:alnum:] ]", " ", .) %>%
  strsplit(x=., split=" ") %>% '[['(1) %>%
  Filter(function(x) { nchar(x) > 0 }, .) %>%
  stemDocument
@@ -37,11 +37,7 @@ split.sentences <- function(char.ls) {
 
 doc2wordvec <- function(str) { sapply(split.sentences(str), sentence.cleaner, simplify=F) } 
 
-ex.doc <- "I hate running@@@@ for president!!!!!!. I love love running!"
-ex.wordvecs <- doc2wordvec(ex.doc)
-
 vec2bow <- function(word.vec) {
-    print(word.vec)
     bow <- list()
     for (i in word.vec) {
         if (i %in% names(bow))
@@ -51,8 +47,6 @@ vec2bow <- function(word.vec) {
     }
     bow
 }
-
-ex.bows <- sapply(ex.wordvecs, vec2bow)
 
 bow.union <- function(bow1, bow2) {
     bow3 <- modifyList(bow1, bow2)
@@ -71,3 +65,61 @@ bow.intersect <- function(bow1, bow2) {
     }
     bow3
 }
+
+bow.similarity <- function(bow1, bow2) {
+    numer <- bow.size(bow.intersect(bow1, bow2))
+    denom <- log(1+bow.size(bow1)) + log(1+bow.size(bow2))
+    numer/denom
+}
+
+bow.size <- function(bow) {
+    Reduce("+", bow, 0)
+}
+
+get.transitions <- function(bows) {
+    n.sent <- length(bows)
+    transition.matrix <- matrix(0, nrow=n.sent, ncol=n.sent)
+    for (i in 1:n.sent) {
+        for (j in 1:n.sent) {
+            transition.matrix[i,j] <- bow.similarity(bows[[i]], bows[[j]])
+        }
+    }
+    normalized.transition.mat <- transition.matrix /
+        matrix(rep(rowSums(transition.matrix), n.sent), nrow=n.sent, ncol=n.sent)
+    normalized.transition.mat
+}
+
+pagerank.iterate <- function(transitions, damp, guess) {
+    n <- nrow(transitions)
+    e <- rep((1-damp)/n, n)
+    damp * t(transitions) %*% guess + e
+}
+
+compute.pagerank <- function(transitions, damp, itrs) {
+    n <- nrow(transitions)
+    init.itr <- rep(1/n, n)
+    next.itr <- pagerank.iterate(transitions, damp, init.itr)
+    for (i in 1:itrs) {
+        init.itr <- next.itr
+        next.itr <- pagerank.iterate(transitions, damp, init.itr)
+    }
+    next.itr
+}
+
+rank.sentences <- function(text) {
+    wordvecs <- doc2wordvec(text)
+    bows <- sapply(wordvecs, vec2bow)
+    probs <- compute.pagerank(get.transitions(bows), 0.85, 10)
+    order(-as.vector(probs))
+}
+
+doc2bow <- function(text) {
+    wordvecs <- doc2wordvec(text)
+    sapply(wordvecs, vec2bow)
+}
+
+ex.doc <- paste(
+    "Back when;;;:/ I first@@@@ started this series of _posts on stochastic calculus, the aim was to write up the notes which I began writing while learning the subject myself.",
+    "The: idea behind these notes was to give a more intuitive and natural, yet fully rigorous,approach to stochastic integration- and semimartingales than the traditional method.",
+    "The stochastic integral and related concepts were developed without requiring advanced results such as optional and predictable projection or the Doob-Meyer decomposition which are often used in traditional approaches.",
+    "Then, the more advanced theory of semimartingales was developed after stochastic integration had already been established.")
