@@ -16,8 +16,6 @@ word.token.ann <- Maxent_Word_Token_Annotator()
 # get rid of empty emails, only look at ID and extracted text
 unclean.text <- filter(emails[,c("Id", "ExtractedBodyText")], nchar(ExtractedBodyText) > 0)
 
-unclean.sample <- sample_n(unclean.text, 20)
-
 sentence.cleaner <-
     . %>%
  tolower %>%
@@ -37,14 +35,39 @@ split.sentences <- function(char.ls) {
     sents
 }
 
+doc2wordvec <- function(str) { sapply(split.sentences(str), sentence.cleaner, simplify=F) } 
+
+ex.doc <- "I hate running@@@@ for president!!!!!!. I love love running!"
+ex.wordvecs <- doc2wordvec(ex.doc)
+
+vec2bow <- function(word.vec) {
+    print(word.vec)
+    bow <- list()
+    for (i in word.vec) {
+        if (i %in% names(bow))
+            bow[[i]] <- bow[[i]] + 1
+        else
+            bow[[i]] <- 1
+    }
+    bow
+}
+
+ex.bows <- sapply(ex.wordvecs, vec2bow)
+
 bow.union <- function(bow1, bow2) {
-    
+    bow3 <- modifyList(bow1, bow2)
+    common.words <- intersect(names(bow1), names(bow2))
+    for (w in common.words) {
+        bow3[[w]] <- bow1[[w]] + bow2[[w]]
+    }
+    bow3
 }
 
 bow.intersect <- function(bow1, bow2) {
-    
-}
-
-vec2bow <- function(word.vec) {
-    
+    bow3 <- list()
+    common.words <- intersect(names(bow1), names(bow2))
+    for (w in common.words) {
+        bow3[[w]] <- min(bow1[[w]], bow2[[w]])
+    }
+    bow3
 }
