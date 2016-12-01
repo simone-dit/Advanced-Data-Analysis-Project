@@ -23,6 +23,9 @@ shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
     	
+    	  #for searching by typing name of node
+    	  # sidebarSearchForm(textId = "searchText", label = "Search..."),
+    	
        #randomization seed
     	  sliderInput("Seed",
     	  		    "Randomization Seed",
