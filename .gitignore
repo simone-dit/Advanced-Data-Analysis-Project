@@ -1,1 +1,6 @@
 *~
+*.RHistory
+*.Rhistory
+*.aux
+*.log
+*.pdf
